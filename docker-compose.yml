@@ -1,0 +1,35 @@
+version: '3'
+services:
+  mosquitto:
+    container_name: mosquitto
+    restart: always
+    build: .
+    networks:
+      - mosquitto-net
+    ports:
+      - 1883:1883
+      - 8083:8083
+      - 8883:8883
+    depends_on:
+      - redis
+    environment:
+      - DOMAIN=mqtt.almondhydroponics.com
+      - EMAIL=francismasha96@gmail.com
+    volumes:
+      - ./auth-plugin.conf:/etc/mosquitto.d/auth-plugin.conf
+      - /etc/ssl:/etc/ssl
+      - ./scripts:/scripts
+
+  redis:
+    container_name: redis-mqtt
+    restart: always
+    image: redis:6.0.6-alpine
+    volumes:
+      - ./tmp/data:/data
+    ports:
+      - "6378:6379"
+    networks:
+      - mosquitto-net
+
+networks:
+  mosquitto-net:
